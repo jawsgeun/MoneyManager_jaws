@@ -4,53 +4,64 @@ import './InputForm.css'
 import AmountChaser from '../components/AmountChaser';
 import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import ItemList from '../components/ItemList';
-import { instanceOf } from 'prop-types';
-import { withCookies, Cookies } from 'react-cookie';
+// import { instanceOf } from 'prop-types';
+// import { withCookies, Cookies } from 'react-cookie';
 
 
 class InputForm extends Component {
-    static propTypes = {
-        cookies: instanceOf(Cookies).isRequired
-    };
-    id=0;
+    // static propTypes = {
+    //     cookies: instanceOf(Cookies).isRequired
+    // };
+    id;
     constructor(props){
         super(props);
         const date = new Date();
-        const { cookies } = props;
+        const today =  date.getFullYear() + "년" + 
+                      (date.getMonth()+1) + "월" + 
+                       date.getDate()+"일";
+        const localDatas = JSON.parse(localStorage.getItem(today));
+        // const { cookies } = props;
+        // const cookieDatas = cookies.get('datas');
+        // console.log(typeof cookieDatas); // 오브젝트 타입
         this.state = {
             amount : '',
             isIncome : '',
             isCash : '',
             detail : '',
-            items : [],
+            items : localDatas || [],
             chaser : '',
             dropdownOpen : false,
             dropdownTitle : '선택하세요',
             incomeBtnSize : 'sm',
             outcomeBtnSize : 'sm',
-            date :  date.getFullYear() + " 년 " + 
-                    (date.getMonth()+1) + " 월 " + 
-                    date.getDate() + " 일",
-            cookieDatas : cookies.get('datas'),
+            date : today,
+            // cookieDatas : cookieDatas,
+        }
+        if(localStorage[this.state.date]===undefined){
+            this.id=0;
+        }else{
+            this.id = Object.keys(localDatas).length;
         }
         // const currentCookie = this.state.cookieDatas[this.state.date];
         // this.id =currentCookie?currentCookie.id : 0;
         // console.log("id : "+this.id);
     }
-    
-    setCookie = ()=>{
-        const {date,items,cookieDatas} = this.state;
-        const { cookies } = this.props;
-        let tmpCookie = {}
-        tmpCookie[date] = {
-            id : this.id,
-            origin:items
-        };
-        tmpCookie =  Object.assign(tmpCookie,cookieDatas);
-        console.log('tmpData ;'+JSON.stringify(tmpCookie));
-        cookies.set('datas', tmpCookie, { path: '/' });
-        this.setState(()=> ({cookieDatas : tmpCookie}))
+    onSubmit = () =>{
+        localStorage[this.state.date] = JSON.stringify(this.state.items);
     }
+    // setCookie = ()=>{
+    //     const {date,items,cookieDatas} = this.state;
+    //     const { cookies } = this.props;
+    //     let tmpCookie = {}
+    //     tmpCookie[date] = {
+    //         id : this.id,
+    //         origin:items
+    //     };
+    //     tmpCookie =  Object.assign(tmpCookie,cookieDatas);
+    //     console.log('tmpData ;'+JSON.stringify(tmpCookie));
+    //     cookies.set('datas', tmpCookie, { path: '/' });
+    //     this.setState(()=> ({cookieDatas : tmpCookie}))
+    // }
     checkValid=()=>{
         const {amount,isIncome,isCash,detail} = this.state;
         if(!amount){
@@ -139,12 +150,18 @@ class InputForm extends Component {
           this.onRegister();
         }
       }
+    onDateChange = (e) =>{
+        this.setState({
+            date : e.target.value
+        })
+    }
     render() {
         const {items,chaser, amount, detail, dropdownOpen,dropdownTitle
                 ,date,incomeBtnSize,outcomeBtnSize} = this.state;
         return (
             <div class="docs-example">
-            <h1>{date} 입니다.</h1>
+            {/* <h1>{date} 입니다.</h1> */}
+            <h1><input type="text" value = {date} onChange = {this.onDateChange}/></h1>
                 <Form>    
                     <Label>금액</Label>&nbsp;&nbsp;&nbsp;
                     <Button id ='income' color="success" size = {incomeBtnSize} onClick = {this.onBtnClick}>수입</Button>&nbsp;
@@ -164,7 +181,6 @@ class InputForm extends Component {
                         <DropdownItem id ='card' onClick ={this.onDropDownClick}>카드</DropdownItem>
                     </DropdownMenu>
                     </Dropdown>
-                
                     <Label>상세 정보</Label>
                     <Input  type="text" 
                             value={detail}
@@ -176,12 +192,11 @@ class InputForm extends Component {
                     <Button onClick ={this.onRegister} color="primary" size = 'lg'>등록</Button>&nbsp;&nbsp;
                     <Button onClick ={this.onCancle} color="danger" size = 'lg' >취소</Button>
                 </Form>
-                <ItemList items={items} onRemove = {this.onRemove}/>
-                <Button color="success" size = 'lg' onClick = {this.setCookie}block>기록 하기</Button>
-                <Button color="success" size = 'lg' onClick = {this.getCookie}block>쿠키 가져오기</Button>
+                <ItemList items={items} onRemove = {this.onRemove} onSubmit = {this.onSubmit}/>
+                <Button color="success" size = 'lg' onClick = {this.onSubmit}block>기록 하기</Button>
             </div>
         );
     }
 }
 
-export default withCookies(InputForm);
+export default InputForm;

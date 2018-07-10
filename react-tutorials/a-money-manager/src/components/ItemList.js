@@ -6,7 +6,7 @@ import './Item.css'
 class ItemList extends Component {
 
     render() {
-        const {items, onRemove} = this.props;
+        const {items, onRemove, onSubmit} = this.props;
         const itemList = items.map(({id,detail,amount,isCash,isIncome})=>(
             <Item
             id = {id}
