@@ -10,7 +10,7 @@ import Header from './components/Header';
 import InputForm from './containers/InputForm';
 import Statistics from './containers/Statistics';
 import Setting from './containers/Setting';
-import { CookiesProvider } from '../node_modules/react-cookie';
+import { CookiesProvider } from 'react-cookie';
 
 ReactDOM.render(
     <CookiesProvider>
@@ -22,6 +22,6 @@ ReactDOM.render(
                 <Route path="/setting" component={Setting}/>
             </div>
         </Router>
-    </CookiesProvider>
+        </CookiesProvider>
     ,document.getElementById('root'));
 registerServiceWorker();

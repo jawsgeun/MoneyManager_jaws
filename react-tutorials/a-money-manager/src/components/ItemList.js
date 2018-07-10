@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Item from './Item';
+import './Item.css'
 
 
 class ItemList extends Component {
@@ -15,6 +16,11 @@ class ItemList extends Component {
             isIncome = {isIncome}
             onRemove = {onRemove}/>
         ))
+        if(itemList.length===0){return(
+            <div className = 'item'>
+                <h3>오늘의 가계부를 입력해보세요!</h3>
+            </div>
+        )}
         return (
             <div>
                 {itemList}
