@@ -4,6 +4,7 @@ import './InputForm.css'
 import AmountChaser from '../components/AmountChaser';
 import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import ItemList from '../components/ItemList';
+import Category from '../components/popup/Category';
 // import { instanceOf } from 'prop-types';
 // import { withCookies, Cookies } from 'react-cookie';
 
@@ -35,6 +36,8 @@ class InputForm extends Component {
             incomeBtnSize : 'sm',
             outcomeBtnSize : 'sm',
             date : today,
+            popup : false,
+            doUpdate : true,
             // cookieDatas : cookieDatas,
         }
         if(localStorage[this.state.date]===undefined){
@@ -155,13 +158,23 @@ class InputForm extends Component {
             date : e.target.value
         })
     }
+    onTogglePopup = () =>{
+        this.setState((prevState)=>({
+            popup : !prevState.popup,
+        }))
+        this.onRegister();
+    }
+    onRefreshDate = ()=>{
+        console.log(this.inputDate.value);
+    }
     render() {
         const {items,chaser, amount, detail, dropdownOpen,dropdownTitle
-                ,date,incomeBtnSize,outcomeBtnSize} = this.state;
+                ,date,incomeBtnSize,outcomeBtnSize,popup} = this.state;
         return (
             <div class="docs-example">
             {/* <h1>{date} 입니다.</h1> */}
-            <h1><input type="text" value = {date} onChange = {this.onDateChange}/></h1>
+            <h1><input type="text" value = {date} onChange = {this.onDateChange} ref = {ref=>this.inputDate = ref}/>
+            <Button color="primary" onClick ={this.onRefreshDate}>날짜 조회</Button></h1>
                 <Form>    
                     <Label>금액</Label>&nbsp;&nbsp;&nbsp;
                     <Button id ='income' color="success" size = {incomeBtnSize} onClick = {this.onBtnClick}>수입</Button>&nbsp;
@@ -194,6 +207,13 @@ class InputForm extends Component {
                 </Form>
                 <ItemList items={items} onRemove = {this.onRemove} onSubmit = {this.onSubmit}/>
                 <Button color="success" size = 'lg' onClick = {this.onSubmit}block>기록 하기</Button>
+                {popup ? 
+                    <Category
+                        text={amount}
+                        closePopup={this.onTogglePopup}
+                        />
+                        : null
+                }
             </div>
         );
     }
