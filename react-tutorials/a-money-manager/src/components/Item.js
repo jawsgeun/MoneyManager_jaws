@@ -26,7 +26,7 @@ class Item extends Component {
                 <h3>{amount}원{'  '}
                  <Badge color={iColor}>{income}</Badge>{'  '}
                  <Badge color='secondary'>{cash}   </Badge>{'  '}
-                 <Badge color='warning'>{category}   </Badge>{'  '}
+                 <Badge color='warning'>{category}</Badge> {'  '}
                  ( {detail} )
                 </h3>
             </div>

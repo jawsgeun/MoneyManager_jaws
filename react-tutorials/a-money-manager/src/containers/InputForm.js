@@ -31,6 +31,7 @@ class InputForm extends Component {
             date : today,
             popup : false,
             doUpdate : true,
+            disabled : false,
         }
         if(localStorage[this.state.date]===undefined){
             this.id=0;
@@ -51,7 +52,7 @@ class InputForm extends Component {
             alert('카드와 현금 중 한 가지를 선택하세요!')
         }else if(detail===''){
             alert('상세 정보를 입력하세요!')
-        }else if(category ==='카테고리 선택'){
+        }else if(!isIncome&&category ==='카테고리 선택'){
             alert('카테고리 정보를 입력하세요!')
         }else{
             return true;
@@ -80,6 +81,15 @@ class InputForm extends Component {
         });
     }
     onBtnClick = (e)=>{
+        if(e.target.id==='income'){
+            this.setState({
+                disabled : true
+            })
+        }else{
+            this.setState({
+                disabled : false
+            })
+        }
         this.setState({
             isIncome : e.target.id==='income'?true:false,
             incomeBtnSize : e.target.id==='income'?'':'sm',
@@ -120,7 +130,7 @@ class InputForm extends Component {
                     detail : detail,
                     isCash : isCash,
                     isIncome : isIncome,
-                    category : category,
+                    category : isIncome? '':category,
                 })
             })
             this.onCancle();
@@ -138,7 +148,7 @@ class InputForm extends Component {
     }
     onRefreshDate = ()=>{
         this.setState({
-            items : JSON.parse(localStorage.getItem(this.inputDate.value)) || []
+            items : JSON.parse(localStorage.getItem(this.dateRef.value)) || []
         })
     }
     onCategoryClick = ()=>{
@@ -159,7 +169,7 @@ class InputForm extends Component {
         };
         return (
             <div className="docs-example">
-            <h1><input type="text" value = {date} onChange = {this.onDateChange} ref = {ref=>this.inputDate = ref}/>
+            <h1><input type="text" value = {date} onChange = {this.onDateChange} ref = {ref=>this.dateRef = ref}/>
             <Button color="primary" onClick ={this.onRefreshDate}>날짜 조회</Button></h1>
                 <Form>    
                     <Label>금액</Label>&nbsp;&nbsp;&nbsp;
@@ -179,7 +189,7 @@ class InputForm extends Component {
                         <DropdownItem id ='card' onClick ={this.onDropDownClick}>카드</DropdownItem>
                     </DropdownMenu>
                     </Dropdown>&nbsp;
-                    <Button id ='category' color="warning" onClick = {this.onCategoryClick}>{category}</Button><br/>
+                    <Button id ='category' color="warning" onClick = {this.onCategoryClick} disabled = {this.state.disabled}>{category}</Button><br/>
                     <Label>상세 정보</Label>
                     <Input  type="text" 
                             value={detail}
