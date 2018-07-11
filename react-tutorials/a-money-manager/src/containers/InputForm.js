@@ -5,14 +5,9 @@ import AmountChaser from '../components/AmountChaser';
 import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import ItemList from '../components/ItemList';
 import Category from '../components/popup/Category';
-// import { instanceOf } from 'prop-types';
-// import { withCookies, Cookies } from 'react-cookie';
 
 
 class InputForm extends Component {
-    // static propTypes = {
-    //     cookies: instanceOf(Cookies).isRequired
-    // };
     id;
     constructor(props){
         super(props);
@@ -21,14 +16,12 @@ class InputForm extends Component {
                       (date.getMonth()+1) + "월" + 
                        date.getDate()+"일";
         const localDatas = JSON.parse(localStorage.getItem(today));
-        // const { cookies } = props;
-        // const cookieDatas = cookies.get('datas');
-        // console.log(typeof cookieDatas); // 오브젝트 타입
         this.state = {
             amount : '',
             isIncome : '',
             isCash : '',
             detail : '',
+            category : '카테고리 선택',
             items : localDatas || [],
             chaser : '',
             dropdownOpen : false,
@@ -38,35 +31,18 @@ class InputForm extends Component {
             date : today,
             popup : false,
             doUpdate : true,
-            // cookieDatas : cookieDatas,
         }
         if(localStorage[this.state.date]===undefined){
             this.id=0;
         }else{
             this.id = Object.keys(localDatas).length;
         }
-        // const currentCookie = this.state.cookieDatas[this.state.date];
-        // this.id =currentCookie?currentCookie.id : 0;
-        // console.log("id : "+this.id);
     }
     onSubmit = () =>{
         localStorage[this.state.date] = JSON.stringify(this.state.items);
     }
-    // setCookie = ()=>{
-    //     const {date,items,cookieDatas} = this.state;
-    //     const { cookies } = this.props;
-    //     let tmpCookie = {}
-    //     tmpCookie[date] = {
-    //         id : this.id,
-    //         origin:items
-    //     };
-    //     tmpCookie =  Object.assign(tmpCookie,cookieDatas);
-    //     console.log('tmpData ;'+JSON.stringify(tmpCookie));
-    //     cookies.set('datas', tmpCookie, { path: '/' });
-    //     this.setState(()=> ({cookieDatas : tmpCookie}))
-    // }
     checkValid=()=>{
-        const {amount,isIncome,isCash,detail} = this.state;
+        const {amount,isIncome,isCash,detail,category} = this.state;
         if(!amount){
             alert('금액을 입력하세요!')
         }else if(isIncome===''){
@@ -75,16 +51,17 @@ class InputForm extends Component {
             alert('카드와 현금 중 한 가지를 선택하세요!')
         }else if(detail===''){
             alert('상세 정보를 입력하세요!')
+        }else if(category ==='카테고리 선택'){
+            alert('카테고리 정보를 입력하세요!')
         }else{
             return true;
         }
         return false;
     }
     onAmountChange = (e)=>{
-        // TODO 천단위 반점 찍는거
-        // TODO 숫자만 입력되게 하기
+        let chaser;
         if(e.target.value){
-            var chaser = e.target.value+"원"; // let 하고 const 안됨
+            chaser = Number(e.target.value).toLocaleString('en')+"원";
         }
         this.setState({
             chaser : chaser,
@@ -119,7 +96,6 @@ class InputForm extends Component {
             dropdownTitle : e.target.id ==='card'?'카드':'현금',
             isCash : e.target.id ==='card'?false:true
         })
-        //console.log(e.target.id)
     }
     onCancle=()=>{
         this.setState({
@@ -131,10 +107,11 @@ class InputForm extends Component {
             isIncome : '',
             incomeBtnSize : 'sm',
             outcomeBtnSize : 'sm',
+            category : '카테고리 선택',
         })
     }
     onRegister =()=>{
-        const{items,amount,detail,isCash,isIncome} = this.state;
+        const{items,amount,detail,isCash,isIncome,category} = this.state;
         if(this.checkValid()){
             this.setState({
                 items : items.concat({
@@ -143,6 +120,7 @@ class InputForm extends Component {
                     detail : detail,
                     isCash : isCash,
                     isIncome : isIncome,
+                    category : category,
                 })
             })
             this.onCancle();
@@ -158,34 +136,41 @@ class InputForm extends Component {
             date : e.target.value
         })
     }
-    onTogglePopup = () =>{
+    onRefreshDate = ()=>{
+        this.setState({
+            items : JSON.parse(localStorage.getItem(this.inputDate.value)) || []
+        })
+    }
+    onCategoryClick = ()=>{
         this.setState((prevState)=>({
             popup : !prevState.popup,
         }))
-        this.onRegister();
     }
-    onRefreshDate = ()=>{
-        console.log(this.inputDate.value);
+    onCategorySelect = (val) =>{
+        this.setState({
+            category: val,
+        })
     }
     render() {
         const {items,chaser, amount, detail, dropdownOpen,dropdownTitle
-                ,date,incomeBtnSize,outcomeBtnSize,popup} = this.state;
+                ,date,incomeBtnSize,outcomeBtnSize,popup,category} = this.state;
+        const style = {
+            display : 'inline',
+        };
         return (
-            <div class="docs-example">
-            {/* <h1>{date} 입니다.</h1> */}
+            <div className="docs-example">
             <h1><input type="text" value = {date} onChange = {this.onDateChange} ref = {ref=>this.inputDate = ref}/>
             <Button color="primary" onClick ={this.onRefreshDate}>날짜 조회</Button></h1>
                 <Form>    
                     <Label>금액</Label>&nbsp;&nbsp;&nbsp;
                     <Button id ='income' color="success" size = {incomeBtnSize} onClick = {this.onBtnClick}>수입</Button>&nbsp;
                     <Button id ='outcome'color="info" size = {outcomeBtnSize} onClick = {this.onBtnClick}>지출</Button>
-                    <Input  type="text"
+                    <Input  type="number"
                             value={amount}
                             placeholder="금액을 입력하세요."
                             onChange = {this.onAmountChange}/>
                     <AmountChaser chaser ={chaser}/>
-                
-                    <Dropdown isOpen={dropdownOpen} toggle={this.onDropDownToggle}>
+                    <Dropdown isOpen={dropdownOpen} toggle={this.onDropDownToggle} style = {style}>
                     <DropdownToggle caret>
                         {dropdownTitle}
                     </DropdownToggle>
@@ -193,7 +178,8 @@ class InputForm extends Component {
                         <DropdownItem id ='cash' onClick ={this.onDropDownClick}>현금</DropdownItem>
                         <DropdownItem id ='card' onClick ={this.onDropDownClick}>카드</DropdownItem>
                     </DropdownMenu>
-                    </Dropdown>
+                    </Dropdown>&nbsp;
+                    <Button id ='category' color="warning" onClick = {this.onCategoryClick}>{category}</Button><br/>
                     <Label>상세 정보</Label>
                     <Input  type="text" 
                             value={detail}
@@ -209,8 +195,8 @@ class InputForm extends Component {
                 <Button color="success" size = 'lg' onClick = {this.onSubmit}block>기록 하기</Button>
                 {popup ? 
                     <Category
-                        text={amount}
-                        closePopup={this.onTogglePopup}
+                        onSelect = {this.onCategorySelect}
+                        closePopup={this.onCategoryClick}
                         />
                         : null
                 }

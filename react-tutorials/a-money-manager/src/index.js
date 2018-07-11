@@ -11,7 +11,6 @@ import Header from './components/Header';
 import InputForm from './containers/InputForm';
 import Statistics from './containers/Statistics';
 import Setting from './containers/Setting';
-// import { CookiesProvider } from 'react-cookie';
 
 ReactDOM.render(
         <Router>

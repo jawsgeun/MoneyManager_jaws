@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {BarChart, Bar,LineChart,Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend} from 'recharts';
-// import { instanceOf } from 'prop-types';
-// import { withCookies, Cookies } from 'react-cookie';
+
 class Statistics extends Component {
     constructor(props){
         super(props);
@@ -25,7 +24,6 @@ class Statistics extends Component {
                     exData.지출 += (vv.amount*1)
                 }
             })
-            // console.log(JSON.stringify(data));
             if(data.수입 !==0||data.지출!==0){localDatas.push(data)}
             exDatas.push(data)
         })
