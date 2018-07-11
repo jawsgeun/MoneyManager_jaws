@@ -5,10 +5,12 @@ import AmountChaser from '../components/AmountChaser';
 import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import ItemList from '../components/ItemList';
 import Category from '../components/popup/Category';
+import Confirm from '../components/popup/Confirm';
 
 
 class InputForm extends Component {
     id;
+    count =0;
     constructor(props){
         super(props);
         const date = new Date();
@@ -29,7 +31,8 @@ class InputForm extends Component {
             incomeBtnSize : 'sm',
             outcomeBtnSize : 'sm',
             date : today,
-            popup : false,
+            categoryPopup : false,
+            confirmPopup : false,
             doUpdate : true,
             disabled : false,
         }
@@ -39,8 +42,27 @@ class InputForm extends Component {
             this.id = Object.keys(localDatas).length;
         }
     }
+    onConfirmCancle = () =>{
+        this.setState((prevState)=>({
+            confirmPopup : !prevState.confirmPopup
+        }))
+    }
+    onConfirmAccept = () =>{
+        this.setState({
+            confirmPopup : false,
+        },()=>{
+            this.onSubmit()
+        })
+    }
+    onConfirm = () =>{
+        if(this.count===0)return false;
+        this.setState({
+            confirmPopup : true,
+        })
+    }
     onSubmit = () =>{
         localStorage[this.state.date] = JSON.stringify(this.state.items);
+        this.count =0;
     }
     checkValid=()=>{
         const {amount,isIncome,isCash,detail,category} = this.state;
@@ -79,6 +101,7 @@ class InputForm extends Component {
         this.setState({
             items : items.filter(items => items.id !== id)
         });
+        this.count--;
     }
     onBtnClick = (e)=>{
         if(e.target.id==='income'){
@@ -133,6 +156,7 @@ class InputForm extends Component {
                     category : isIncome? '':category,
                 })
             })
+            this.count++;
             this.onCancle();
         }
     }
@@ -163,7 +187,7 @@ class InputForm extends Component {
     }
     render() {
         const {items,chaser, amount, detail, dropdownOpen,dropdownTitle
-                ,date,incomeBtnSize,outcomeBtnSize,popup,category} = this.state;
+                ,date,incomeBtnSize,outcomeBtnSize,categoryPopup,confirmPopup,category} = this.state;
         const style = {
             display : 'inline',
         };
@@ -202,12 +226,20 @@ class InputForm extends Component {
                     <Button onClick ={this.onCancle} color="danger" size = 'lg' >취소</Button>
                 </Form>
                 <ItemList items={items} onRemove = {this.onRemove} onSubmit = {this.onSubmit}/>
-                <Button color="success" size = 'lg' onClick = {this.onSubmit}block>기록 하기</Button>
-                {popup ? 
+                <Button color="success" size = 'lg' onClick = {this.onConfirm} block>기록 하기</Button>
+                {categoryPopup ? 
                     <Category
                         onSelect = {this.onCategorySelect}
                         closePopup={this.onCategoryClick}
                         />
+                        : null
+                }
+                {confirmPopup ? 
+                    <Confirm
+                         onCancle ={this.onConfirmCancle}
+                         onConfirm ={this.onConfirmAccept}
+                        count ={this.count}
+                    />
                         : null
                 }
             </div>
