@@ -6,6 +6,7 @@ import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap
 import ItemList from '../components/ItemList';
 import Category from '../components/popup/Category';
 import Confirm from '../components/popup/Confirm';
+import CalendarPopup from '../components/popup/CalendarPopup';
 
 
 class InputForm extends Component {
@@ -14,10 +15,10 @@ class InputForm extends Component {
     constructor(props){
         super(props);
         const date = new Date();
-        const today =  date.getFullYear() + "년" + 
+        const convertedDate =  date.getFullYear() + "년" + 
                       (date.getMonth()+1) + "월" + 
                        date.getDate()+"일";
-        const localDatas = JSON.parse(localStorage.getItem(today));
+        const localDatas = JSON.parse(localStorage.getItem(convertedDate));
         this.state = {
             amount : '',
             isIncome : '',
@@ -30,9 +31,11 @@ class InputForm extends Component {
             dropdownTitle : '선택하세요',
             incomeBtnSize : 'sm',
             outcomeBtnSize : 'sm',
-            date : today,
+            date : date,
+            convertedDate : convertedDate,
             categoryPopup : false,
             confirmPopup : false,
+            calendarPopup : false,
             doUpdate : true,
             disabled : false,
         }
@@ -165,19 +168,14 @@ class InputForm extends Component {
           this.onRegister();
         }
       }
-    onDateChange = (e) =>{
+    onRefreshDate = (selectedDate)=>{
         this.setState({
-            date : e.target.value
-        })
-    }
-    onRefreshDate = ()=>{
-        this.setState({
-            items : JSON.parse(localStorage.getItem(this.dateRef.value)) || []
+            items : JSON.parse(localStorage.getItem(selectedDate)) || []
         })
     }
     onCategoryClick = ()=>{
         this.setState((prevState)=>({
-            popup : !prevState.popup,
+            categoryPopup : !prevState.categoryPopup,
         }))
     }
     onCategorySelect = (val) =>{
@@ -185,16 +183,30 @@ class InputForm extends Component {
             category: val,
         })
     }
+    onCalendarClick = ()=>{
+        this.setState((prevState)=>({
+            calendarPopup : !prevState.calendarPopup,
+        }));
+    }
+    onCalendarSubmit = (date,convertedDate)=>{
+        this.setState({
+            date : date,
+            convertedDate : convertedDate,
+            calendarPopup : false,
+        },()=>{
+            this.onRefreshDate(convertedDate);
+        })
+    }
     render() {
         const {items,chaser, amount, detail, dropdownOpen,dropdownTitle
-                ,date,incomeBtnSize,outcomeBtnSize,categoryPopup,confirmPopup,category} = this.state;
+                ,date,convertedDate,incomeBtnSize,outcomeBtnSize,categoryPopup,confirmPopup,calendarPopup,category} = this.state;
         const style = {
             display : 'inline',
         };
         return (
             <div className="docs-example">
-            <h1><input type="text" value = {date} onChange = {this.onDateChange} ref = {ref=>this.dateRef = ref}/>
-            <Button color="primary" onClick ={this.onRefreshDate}>날짜 조회</Button></h1>
+            <h1>{convertedDate}&nbsp;&nbsp;
+            <Button color="primary" onClick ={this.onCalendarClick}>달력에서 조회</Button></h1>
                 <Form>    
                     <Label>금액</Label>&nbsp;&nbsp;&nbsp;
                     <Button id ='income' color="success" size = {incomeBtnSize} onClick = {this.onBtnClick}>수입</Button>&nbsp;
@@ -239,6 +251,13 @@ class InputForm extends Component {
                          onCancle ={this.onConfirmCancle}
                          onConfirm ={this.onConfirmAccept}
                         count ={this.count}
+                    />
+                        : null
+                }
+                {calendarPopup ? 
+                    <CalendarPopup
+                        selectedDate = {date}
+                        onSubmit = {this.onCalendarSubmit}
                     />
                         : null
                 }
