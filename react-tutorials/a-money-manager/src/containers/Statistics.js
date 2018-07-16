@@ -8,7 +8,7 @@ class Statistics extends Component {
         const keys = Object.keys(localStorage)
         const from = keys[0];
         const to = keys[keys.length-1];
-        const {localDatas,exDatas,cateDatas} = this.initData(from,to);
+        const {localDatas,exDatas,cateDatas} = this.initData(from,to);  
         this.state = {
             datas : localDatas,
             expenseDatas : exDatas,
@@ -35,9 +35,9 @@ class Statistics extends Component {
         const cateDatas = [];
         let fashion = {name : '의류' ,비용 :0};
         let food = {name : '음식',비용 :0};
-        let traffic= {name : '교통',비용 :0};
+        let traffic = {name : '교통',비용 :0};
         Object.keys(localStorage).forEach( v =>{
-            if(v<from||v>to)return false;
+            if(v<from||v>to) return false;
             let data = {};    
             data.name = v.substring(5);
             data.수입 =0;
