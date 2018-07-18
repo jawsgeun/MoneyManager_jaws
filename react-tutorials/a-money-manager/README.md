@@ -1,6 +1,6 @@
 React MoneyManager Example
 ==========================
-##functions
+## functions
 1. Register budget and Managing
 2. Statistics for your money useage history
 created by whtnrms2017
