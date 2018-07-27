@@ -64,7 +64,7 @@ class InputForm extends Component {
     })
   }
   onSubmit = () => {
-    localStorage[this.state.date] = JSON.stringify(this.state.items);
+    localStorage[this.state.convertedDate] = JSON.stringify(this.state.items);
     this.count = 0;
   }
   checkValid = () => {
